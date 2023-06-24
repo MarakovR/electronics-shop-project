@@ -61,13 +61,28 @@ class Item:
 
     @classmethod
     def instantiate_from_csv(cls):
-        with open("../src/items.csv", encoding='windows-1251') as csvfile:
-            reader = csv.DictReader(csvfile)
-            Item.all = []
-            for row in reader:
-                Item(row['name'], row['price'], row['quantity'])
+        try:
+            with open("../src/items.csv", encoding='windows-1251') as csvfile:
+                reader = csv.DictReader(csvfile)
+                Item.all = []
+                for row in reader:
+                    InstantiateCSVError(row)
+                    Item(row["name"], row['price'], row['quantity'])
 
-    @staticmethod
-    def string_to_number(value):
-        int_value = int(value[0])
+        except FileNotFoundError:
+            print('Отсутствует файл item.csv')
+
+    def string_to_number(self):
+        int_value = int(self[0])
         return int_value
+
+
+class InstantiateCSVError:
+    def __init__(self, content):
+        self.content = content
+        for k, v in self.content.items():
+            if k is None:
+                raise Exception('Файл item.csv поврежден')
+            elif v is None:
+                raise Exception('Файл item.csv поврежден')
+
