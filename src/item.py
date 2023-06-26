@@ -66,9 +66,10 @@ class Item:
                 reader = csv.DictReader(csvfile)
                 Item.all = []
                 for row in reader:
-                    InstantiateCSVError(row)
-                    Item(row["name"], row['price'], row['quantity'])
-
+                    if list(row.keys()) == ['name', 'price', 'quantity']:
+                        Item(row["name"], row['price'], row['quantity'])
+                    else:
+                        raise InstantiateCSVError("Файл item.csv поврежден")
         except FileNotFoundError:
             print('Отсутствует файл item.csv')
 
@@ -77,12 +78,9 @@ class Item:
         return int_value
 
 
-class InstantiateCSVError:
-    def __init__(self, content):
-        self.content = content
-        for k, v in self.content.items():
-            if k is None:
-                raise Exception('Файл item.csv поврежден')
-            elif v is None:
-                raise Exception('Файл item.csv поврежден')
+class InstantiateCSVError(Exception):
+    def __init__(self, *args, **kwargs):
+        self.message = args[0] if args else "Файл item.csv поврежден"
 
+    def __str__(self):
+        return self.message
